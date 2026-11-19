@@ -1,0 +1,9 @@
+tipo;data;descricao;categoria;valor;parcelas
+Receita;05/11/2026;Salário;Salário;4200.0;1
+Despesa;06/11/2026;Aluguel;Moradia;1350.0;1
+Despesa;08/11/2026;Supermercado;Alimentação;612.4;1
+Despesa parcelada;10/11/2026;Celular novo;Outras despesas;1800.0;6
+Receita;12/11/2026;Freela de site;Renda extra;800.0;1
+Despesa;14/11/2026;Combustível;Transporte;220.0;1
+Despesa;15/11/2026;Farmácia;Saúde;89.9;1
+Despesa;16/11/2026;Cinema;Lazer;64.0;1
