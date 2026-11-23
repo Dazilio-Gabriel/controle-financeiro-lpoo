@@ -1,25 +1,15 @@
 package TrabFinal;
 
-import javax.swing.UIManager;
+import javafx.application.Application;
 
-// Ponto de entrada do programa: só prepara o visual e abre a tela.
+// Ponto de entrada do programa: só manda o JavaFX abrir a tela.
+// O main fica separado de TelaPrincipal de propósito: como esta classe não
+// herda de Application, o programa roda só com os .jar da pasta lib no
+// classpath, sem precisar configurar mais nada.
 public class Main {
 
 	public static void main(String[] args) {
-		usarVisualDoSistema();
-
-		TelaPrincipal tela = new TelaPrincipal();
-		tela.setVisible(true);
-	}
-
-	// deixa as janelas com a aparência do Windows em vez da aparência padrão do Java
-	private static void usarVisualDoSistema() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			// se não der para trocar, o programa segue com o visual padrão
-			System.out.println("Não foi possível usar o visual do sistema: " + e.getMessage());
-		}
+		Application.launch(TelaPrincipal.class, args);
 	}
 
 }

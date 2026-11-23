@@ -73,6 +73,17 @@ public abstract class Lancamento implements Comparable<Lancamento> {
 		return "";
 	}
 
+	// os dois gets abaixo são usados pelas colunas da tabela da tela
+
+	public String getDataFormatada() {
+		return Formatador.formatarData(data);
+	}
+
+	// chama getValorNoSaldo(), então o sinal já vem certo de cada subclasse
+	public String getValorFormatado() {
+		return Formatador.formatarMoeda(getValorNoSaldo());
+	}
+
 	// usado pelo Collections.sort para deixar a lista em ordem de data
 	@Override
 	public int compareTo(Lancamento outro) {

@@ -22,7 +22,7 @@ O tema é uma parte do **Jarvis Financeiro**, o projeto do grupo em Projeto Inte
 | **Tratamento de exceção** | `LancamentoInvalidoException` é a exceção do sistema, lançada com `throw` nos construtores quando um dado está errado. A tela trata com `try/catch` em `adicionarLancamento()`. `NumberFormatException` e `DateTimeParseException` são capturadas e convertidas. A leitura e a gravação tratam `IOException` e usam `finally` para fechar o arquivo. |
 | **Coleções** | `ArrayList<Lancamento>` guarda os lançamentos e é ordenada com `Collections.sort` (a classe `Lancamento` implementa `Comparable`). `TreeMap<String, Double>` soma as despesas por categoria. |
 | **Leitura e gravação** | `ArquivoLancamentos` lê e grava `dados/lancamentos.csv`. O arquivo é lido quando o programa abre e regravado a cada inclusão ou remoção. |
-| **Interface gráfica** | `TelaPrincipal` (Swing): formulário, tabela, resumo e janelas de aviso. |
+| **Interface gráfica** | `TelaPrincipal` (JavaFX): formulário, tabela (`TableView`), resumo e janelas de aviso (`Alert`). |
 
 ## Classes
 
@@ -30,8 +30,8 @@ Todas ficam no pacote `TrabFinal`, uma por arquivo.
 
 | Classe | Responsabilidade |
 |---|---|
-| `Main` | Abre a tela. |
-| `TelaPrincipal` | Interface gráfica e eventos dos botões. |
+| `Main` | Manda o JavaFX abrir a tela. |
+| `TelaPrincipal` | Interface gráfica em JavaFX e eventos dos botões. |
 | `ControleFinanceiro` | Lista de lançamentos e contas (totais, saldo, resumo por categoria). |
 | `ArquivoLancamentos` | Leitura e gravação do `.csv`. |
 | `Lancamento` | Classe abstrata com os dados comuns e as validações. |
@@ -72,11 +72,14 @@ TrabFinal/
 ├── .project, .classpath, .settings/   configuração do Eclipse
 ├── dados/
 │   └── lancamentos.csv                lançamentos de exemplo
+├── lib/                               JavaFX 21 (.jar para Windows)
 └── src/
     └── TrabFinal/                     pacote com as classes (.java)
 ```
 
 ## Como rodar
+
+O JavaFX não vem dentro do JDK, por isso os `.jar` dele (versão 21.0.13, para Windows 64 bits) já estão na pasta `lib` e no classpath do projeto. Não precisa instalar nada além do JDK 17 ou mais novo.
 
 **No Eclipse**
 
@@ -84,12 +87,20 @@ TrabFinal/
 2. Escolha a pasta do projeto e clique em *Finish*.
 3. Abra `src/TrabFinal/Main.java` e use *Run As → Java Application*.
 
-**Pelo terminal**, dentro da pasta do projeto (precisa do JDK 17 ou mais novo):
+Ao abrir, o console mostra um aviso `Unsupported JavaFX configuration: classes were loaded from 'unnamed module'`. Ele é esperado e não atrapalha: só informa que o JavaFX foi carregado pelo classpath. Para o aviso sumir, coloque em *Run → Run Configurations → Arguments → VM arguments*:
 
 ```
-javac -encoding UTF-8 -d bin src/TrabFinal/*.java
-java -cp bin TrabFinal.Main
+--module-path lib --add-modules javafx.controls
 ```
+
+**Pelo terminal**, dentro da pasta do projeto:
+
+```
+javac -encoding UTF-8 -cp "lib/*" -d bin src/TrabFinal/*.java
+java -cp "bin;lib/*" TrabFinal.Main
+```
+
+A primeira versão da tela foi feita em Swing e continua guardada na tag `versao-swing` do repositório.
 
 O programa procura o arquivo `dados/lancamentos.csv` a partir da pasta em que foi executado. Se o arquivo não existir, ele começa vazio e cria o arquivo no primeiro lançamento.
 

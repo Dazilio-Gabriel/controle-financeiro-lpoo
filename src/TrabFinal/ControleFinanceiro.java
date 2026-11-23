@@ -29,8 +29,8 @@ public class ControleFinanceiro {
 		ordenarPorData();
 	}
 
-	public void remover(int posicao) {
-		lancamentos.remove(posicao);
+	public void remover(Lancamento lancamento) {
+		lancamentos.remove(lancamento);
 	}
 
 	// o sort usa o compareTo de Lancamento, que compara pela data

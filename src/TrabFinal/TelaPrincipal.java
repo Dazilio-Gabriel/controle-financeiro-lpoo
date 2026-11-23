@@ -1,73 +1,84 @@
 package TrabFinal;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.TreeMap;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
-// Interface gráfica do sistema (Swing).
+// Interface gráfica do sistema (JavaFX).
 // A tela só conversa com o usuário: as contas ficam em ControleFinanceiro
 // e a leitura/gravação fica em ArquivoLancamentos.
-public class TelaPrincipal extends JFrame implements ActionListener {
-
-	private static final long serialVersionUID = 1L;
+public class TelaPrincipal extends Application implements EventHandler<ActionEvent> {
 
 	private static final String CAMINHO_ARQUIVO = "dados/lancamentos.csv";
 	private static final String[] TIPOS = { Receita.TIPO, Despesa.TIPO, DespesaParcelada.TIPO };
-	private static final String[] COLUNAS = { "Data", "Tipo", "Descrição", "Categoria", "Valor", "Observação" };
-	private static final int COLUNA_VALOR = 4;
-	private static final Color VERDE = new Color(0, 128, 0);
-	private static final Color VERMELHO = new Color(190, 0, 0);
+	private static final int QUANT_CAMPOS = 6;
+	private static final Color VERDE = Color.rgb(0, 128, 0);
+	private static final Color VERMELHO = Color.rgb(190, 0, 0);
 
 	private ControleFinanceiro controle;
 	private ArquivoLancamentos arquivo;
 
-	private JComboBox<String> comboTipo;
-	private JTextField campoDescricao;
-	private JTextField campoValor;
-	private JTextField campoData;
-	private JComboBox<String> comboCategoria;
-	private JTextField campoParcelas;
+	private Stage janela;
 
-	private JButton botaoAdicionar;
-	private JButton botaoRemover;
-	private JButton botaoResumo;
+	private ComboBox<String> comboTipo;
+	private TextField campoDescricao;
+	private TextField campoValor;
+	private TextField campoData;
+	private ComboBox<String> comboCategoria;
+	private TextField campoParcelas;
 
-	private DefaultTableModel modeloTabela;
-	private JTable tabela;
+	private Button botaoAdicionar;
+	private Button botaoRemover;
+	private Button botaoResumo;
 
-	private JLabel rotuloReceitas;
-	private JLabel rotuloDespesas;
-	private JLabel rotuloSaldo;
+	private TableView<Lancamento> tabela;
 
-	public TelaPrincipal() {
-		super("Controle Financeiro - Trabalho de LPOO");
+	private Label rotuloReceitas;
+	private Label rotuloDespesas;
+	private Label rotuloSaldo;
+
+	// o JavaFX chama este método quando o programa abre
+	@Override
+	public void start(Stage janela) {
+		this.janela = janela;
 
 		controle = new ControleFinanceiro();
 		arquivo = new ArquivoLancamentos(CAMINHO_ARQUIVO);
 
-		montarTela();
+		janela.setTitle("Controle Financeiro - Trabalho de LPOO");
+		janela.setScene(montarTela());
+		janela.show();
+
 		carregarLancamentos();
 		atualizarTela();
 	}
@@ -76,112 +87,137 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 	// Montagem da tela
 	// ---------------------------------------------------------------
 
-	private void montarTela() {
-		JPanel conteudo = new JPanel(new BorderLayout(10, 10));
-		conteudo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	private Scene montarTela() {
+		TitledPane painelFormulario = criarPainelFormulario();
+		TitledPane painelTabela = criarPainelTabela();
+		TitledPane painelResumo = criarPainelResumo();
 
-		conteudo.add(criarPainelFormulario(), BorderLayout.NORTH);
-		conteudo.add(criarPainelTabela(), BorderLayout.CENTER);
-		conteudo.add(criarPainelResumo(), BorderLayout.SOUTH);
+		// os três painéis ficam um embaixo do outro
+		VBox raiz = new VBox(10, painelFormulario, painelTabela, painelResumo);
+		raiz.setPadding(new Insets(10));
 
-		setContentPane(conteudo);
+		// quando a janela cresce, quem ganha o espaço é a tabela
+		VBox.setVgrow(painelTabela, Priority.ALWAYS);
+
 		atualizarCamposDoTipo();
 
-		// apertar Enter em qualquer campo funciona como clicar em Adicionar
-		getRootPane().setDefaultButton(botaoAdicionar);
-
-		setSize(960, 580);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		return new Scene(raiz, 960, 580);
 	}
 
-	private JPanel criarPainelFormulario() {
-		comboTipo = new JComboBox<String>(TIPOS);
-		comboTipo.addActionListener(this);
-		campoDescricao = new JTextField();
-		campoValor = new JTextField();
-		campoData = new JTextField(Formatador.formatarData(LocalDate.now()));
-		comboCategoria = new JComboBox<String>();
-		campoParcelas = new JTextField();
+	private TitledPane criarPainelFormulario() {
+		comboTipo = new ComboBox<String>();
+		comboTipo.getItems().addAll(TIPOS);
+		comboTipo.setValue(Receita.TIPO);
+		comboTipo.setOnAction(this);
+		campoDescricao = new TextField();
+		campoValor = new TextField();
+		campoData = new TextField(Formatador.formatarData(LocalDate.now()));
+		comboCategoria = new ComboBox<String>();
+		campoParcelas = new TextField();
 
 		// linha de cima com os nomes, linha de baixo com os campos
-		JPanel campos = new JPanel(new GridLayout(2, 6, 8, 4));
-		campos.add(new JLabel("Tipo"));
-		campos.add(new JLabel("Descrição"));
-		campos.add(new JLabel("Valor (R$)"));
-		campos.add(new JLabel("Data (dd/mm/aaaa)"));
-		campos.add(new JLabel("Categoria"));
-		campos.add(new JLabel("Parcelas"));
-		campos.add(comboTipo);
-		campos.add(campoDescricao);
-		campos.add(campoValor);
-		campos.add(campoData);
-		campos.add(comboCategoria);
-		campos.add(campoParcelas);
+		GridPane campos = new GridPane();
+		campos.setHgap(8);
+		campos.setVgap(4);
+		adicionarCampo(campos, 0, "Tipo", comboTipo);
+		adicionarCampo(campos, 1, "Descrição", campoDescricao);
+		adicionarCampo(campos, 2, "Valor (R$)", campoValor);
+		adicionarCampo(campos, 3, "Data (dd/mm/aaaa)", campoData);
+		adicionarCampo(campos, 4, "Categoria", comboCategoria);
+		adicionarCampo(campos, 5, "Parcelas", campoParcelas);
 
 		botaoAdicionar = criarBotao("Adicionar");
 		botaoRemover = criarBotao("Remover selecionado");
 		botaoResumo = criarBotao("Resumo por categoria");
 
-		JPanel botoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-		botoes.add(botaoAdicionar);
-		botoes.add(botaoRemover);
-		botoes.add(botaoResumo);
+		// apertar Enter em qualquer campo funciona como clicar em Adicionar
+		botaoAdicionar.setDefaultButton(true);
 
-		JPanel painel = new JPanel(new BorderLayout(0, 8));
-		painel.setBorder(BorderFactory.createTitledBorder("Novo lançamento"));
-		painel.add(campos, BorderLayout.CENTER);
-		painel.add(botoes, BorderLayout.SOUTH);
+		HBox botoes = new HBox(8, botaoAdicionar, botaoRemover, botaoResumo);
+
+		return criarPainel("Novo lançamento", new VBox(10, campos, botoes));
+	}
+
+	// coloca o nome em cima e o campo embaixo, na coluna indicada.
+	// Todas as colunas ficam com a mesma largura.
+	private void adicionarCampo(GridPane grade, int coluna, String nome, Control campo) {
+		ColumnConstraints largura = new ColumnConstraints();
+		largura.setPercentWidth(100.0 / QUANT_CAMPOS);
+		grade.getColumnConstraints().add(largura);
+
+		campo.setMaxWidth(Double.MAX_VALUE);
+
+		grade.add(new Label(nome), coluna, 0);
+		grade.add(campo, coluna, 1);
+	}
+
+	// todos os botões são criados do mesmo jeito, por isso um método só
+	private Button criarBotao(String texto) {
+		Button botao = new Button(texto);
+		botao.setOnAction(this);
+		return botao;
+	}
+
+	// painel com título em cima, usado nas três partes da tela
+	private TitledPane criarPainel(String titulo, Node conteudo) {
+		TitledPane painel = new TitledPane(titulo, conteudo);
+		painel.setCollapsible(false);
+		return painel;
+	}
+
+	private TitledPane criarPainelTabela() {
+		tabela = new TableView<Lancamento>();
+		tabela.setPlaceholder(new Label("Nenhum lançamento cadastrado."));
+
+		// cada coluna mostra o resultado de um get de Lancamento
+		TableColumn<Lancamento, String> colunaValor = criarColuna("Valor", "valorFormatado", 130);
+		colunaValor.setStyle("-fx-alignment: CENTER-RIGHT;");
+
+		tabela.getColumns().add(criarColuna("Data", "dataFormatada", 100));
+		tabela.getColumns().add(criarColuna("Tipo", "tipo", 140));
+		tabela.getColumns().add(criarColuna("Descrição", "descricao", 230));
+		tabela.getColumns().add(criarColuna("Categoria", "categoria", 150));
+		tabela.getColumns().add(colunaValor);
+		tabela.getColumns().add(criarColuna("Observação", "observacao", 160));
+
+		TitledPane painel = criarPainel("Lançamentos", tabela);
+		painel.setMaxHeight(Double.MAX_VALUE);
 
 		return painel;
 	}
 
-	// todos os botões são criados do mesmo jeito, por isso um método só
-	private JButton criarBotao(String texto) {
-		JButton botao = new JButton(texto);
-		botao.addActionListener(this);
-		return botao;
+	// PropertyValueFactory("descricao") faz a coluna chamar getDescricao()
+	// de cada lançamento; "tipo" chama getTipo(), e assim por diante
+	private TableColumn<Lancamento, String> criarColuna(String titulo, String propriedade, double largura) {
+		TableColumn<Lancamento, String> coluna = new TableColumn<Lancamento, String>(titulo);
+		coluna.setCellValueFactory(new PropertyValueFactory<Lancamento, String>(propriedade));
+		coluna.setPrefWidth(largura);
+
+		// a ordem da tabela é sempre a da lista (por data)
+		coluna.setSortable(false);
+		coluna.setReorderable(false);
+
+		return coluna;
 	}
 
-	private JScrollPane criarPainelTabela() {
-		modeloTabela = new DefaultTableModel(COLUNAS, 0);
-		tabela = new JTable(modeloTabela);
-
-		// a tabela é só para consulta: sem editor, ninguém altera as células
-		tabela.setDefaultEditor(Object.class, null);
-		tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tabela.getTableHeader().setReorderingAllowed(false);
-		tabela.setRowHeight(22);
-
-		// valores em dinheiro ficam alinhados à direita
-		DefaultTableCellRenderer alinhadoDireita = new DefaultTableCellRenderer();
-		alinhadoDireita.setHorizontalAlignment(SwingConstants.RIGHT);
-		tabela.getColumnModel().getColumn(COLUNA_VALOR).setCellRenderer(alinhadoDireita);
-
-		JScrollPane rolagem = new JScrollPane(tabela);
-		rolagem.setBorder(BorderFactory.createTitledBorder("Lançamentos"));
-
-		return rolagem;
-	}
-
-	private JPanel criarPainelResumo() {
+	private TitledPane criarPainelResumo() {
 		rotuloReceitas = criarRotuloResumo(VERDE);
 		rotuloDespesas = criarRotuloResumo(VERMELHO);
 		rotuloSaldo = criarRotuloResumo(VERDE);
 
-		JPanel painel = new JPanel(new GridLayout(1, 3, 8, 0));
-		painel.setBorder(BorderFactory.createTitledBorder("Resumo"));
-		painel.add(rotuloReceitas);
-		painel.add(rotuloDespesas);
-		painel.add(rotuloSaldo);
-
-		return painel;
+		return criarPainel("Resumo", new HBox(rotuloReceitas, rotuloDespesas, rotuloSaldo));
 	}
 
-	private JLabel criarRotuloResumo(Color cor) {
-		JLabel rotulo = new JLabel("", SwingConstants.CENTER);
-		rotulo.setFont(rotulo.getFont().deriveFont(Font.BOLD, 15f));
-		rotulo.setForeground(cor);
+	private Label criarRotuloResumo(Color cor) {
+		Label rotulo = new Label();
+		rotulo.setFont(Font.font("System", FontWeight.BOLD, 15));
+		rotulo.setTextFill(cor);
+		rotulo.setAlignment(Pos.CENTER);
+
+		// os três rótulos dividem a largura do painel
+		rotulo.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(rotulo, Priority.ALWAYS);
+
 		return rotulo;
 	}
 
@@ -191,7 +227,7 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 
 	// todo clique de botão e toda troca do tipo passam por aqui
 	@Override
-	public void actionPerformed(ActionEvent evento) {
+	public void handle(ActionEvent evento) {
 		Object origem = evento.getSource();
 
 		if (origem == botaoAdicionar) {
@@ -207,8 +243,8 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 
 	private void adicionarLancamento() {
 		try {
-			String tipo = (String) comboTipo.getSelectedItem();
-			String categoria = (String) comboCategoria.getSelectedItem();
+			String tipo = comboTipo.getValue();
+			String categoria = comboCategoria.getValue();
 			double valor = lerValor();
 			LocalDate data = Formatador.converterData(campoData.getText());
 			int parcelas = lerParcelas();
@@ -228,19 +264,22 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 	}
 
 	private void removerLancamento() {
-		int linha = tabela.getSelectedRow();
+		Lancamento selecionado = tabela.getSelectionModel().getSelectedItem();
 
-		if (linha == -1) {
+		if (selecionado == null) {
 			mostrarErro("Selecione um lançamento na tabela para remover.");
 			return;
 		}
 
-		int resposta = JOptionPane.showConfirmDialog(this, "Remover o lançamento selecionado?", "Confirmar",
-				JOptionPane.YES_NO_OPTION);
+		Alert confirmacao = criarAlerta(AlertType.CONFIRMATION, "Confirmar",
+				"Remover o lançamento \"" + selecionado.getDescricao() + "\"?");
+		confirmacao.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
 
-		if (resposta == JOptionPane.YES_OPTION) {
-			// a tabela mostra a lista na mesma ordem, então a linha é a posição
-			controle.remover(linha);
+		// showAndWait espera o usuário responder e devolve o botão escolhido
+		Optional<ButtonType> resposta = confirmacao.showAndWait();
+
+		if (resposta.isPresent() && resposta.get() == ButtonType.YES) {
+			controle.remover(selecionado);
 			salvarLancamentos();
 			atualizarTela();
 		}
@@ -248,44 +287,38 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 
 	private void mostrarResumoPorCategoria() {
 		TreeMap<String, Double> totais = controle.calcularDespesasPorCategoria();
-
-		if (totais.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Nenhuma despesa lançada ainda.", "Despesas por categoria",
-					JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-
 		String texto = "";
 
-		for (String categoria : totais.keySet()) {
-			texto = texto + categoria + ": " + Formatador.formatarMoeda(totais.get(categoria)) + "\n";
+		if (totais.isEmpty()) {
+			texto = "Nenhuma despesa lançada ainda.";
+		} else {
+			for (String categoria : totais.keySet()) {
+				texto = texto + categoria + ": " + Formatador.formatarMoeda(totais.get(categoria)) + "\n";
+			}
+
+			texto = texto + "\nTotal: " + Formatador.formatarMoeda(controle.calcularTotalDespesas());
 		}
 
-		texto = texto + "\nTotal: " + Formatador.formatarMoeda(controle.calcularTotalDespesas());
-
-		JOptionPane.showMessageDialog(this, texto, "Despesas por categoria", JOptionPane.INFORMATION_MESSAGE);
+		criarAlerta(AlertType.INFORMATION, "Despesas por categoria", texto).showAndWait();
 	}
 
 	// troca as categorias e libera o campo de parcelas conforme o tipo escolhido
 	private void atualizarCamposDoTipo() {
-		String tipo = (String) comboTipo.getSelectedItem();
+		String tipo = comboTipo.getValue();
 		String[] categorias = Despesa.CATEGORIAS;
 
 		if (Receita.TIPO.equals(tipo)) {
 			categorias = Receita.CATEGORIAS;
 		}
 
-		comboCategoria.removeAllItems();
-
-		for (int i = 0; i < categorias.length; i++) {
-			comboCategoria.addItem(categorias[i]);
-		}
+		comboCategoria.getItems().setAll(categorias);
+		comboCategoria.setValue(categorias[0]);
 
 		if (DespesaParcelada.TIPO.equals(tipo)) {
-			campoParcelas.setEnabled(true);
+			campoParcelas.setDisable(false);
 			campoParcelas.setText("2");
 		} else {
-			campoParcelas.setEnabled(false);
+			campoParcelas.setDisable(true);
 			campoParcelas.setText("1");
 		}
 	}
@@ -312,8 +345,8 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 	}
 
 	private void limparCampos() {
-		campoDescricao.setText("");
-		campoValor.setText("");
+		campoDescricao.clear();
+		campoValor.clear();
 		campoDescricao.requestFocus();
 	}
 
@@ -326,9 +359,9 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 			controle.adicionarTodos(arquivo.ler());
 
 			if (arquivo.getLinhasIgnoradas() > 0) {
-				JOptionPane.showMessageDialog(this,
-						arquivo.getLinhasIgnoradas() + " linha(s) do arquivo estavam com erro e foram ignoradas.",
-						"Aviso", JOptionPane.WARNING_MESSAGE);
+				criarAlerta(AlertType.WARNING, "Aviso",
+						arquivo.getLinhasIgnoradas() + " linha(s) do arquivo estavam com erro e foram ignoradas.")
+						.showAndWait();
 			}
 		} catch (IOException e) {
 			mostrarErro("Não foi possível ler o arquivo de lançamentos:\n" + e.getMessage());
@@ -349,19 +382,10 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 
 	// redesenha a tabela e o resumo a partir da lista de lançamentos
 	private void atualizarTela() {
-		modeloTabela.setRowCount(0);
-
-		// polimorfismo: a tela não pergunta qual é a classe de cada objeto;
-		// getTipo(), getValorNoSaldo() e getObservacao() respondem por ela
-		for (Lancamento lancamento : controle.getLancamentos()) {
-			modeloTabela.addRow(new Object[] {
-					Formatador.formatarData(lancamento.getData()),
-					lancamento.getTipo(),
-					lancamento.getDescricao(),
-					lancamento.getCategoria(),
-					Formatador.formatarMoeda(lancamento.getValorNoSaldo()),
-					lancamento.getObservacao() });
-		}
+		// polimorfismo: a tabela recebe a lista de Lancamento e chama os gets
+		// de cada objeto sem saber qual é a classe dele. getTipo(),
+		// getValorFormatado() e getObservacao() respondem conforme a subclasse.
+		tabela.getItems().setAll(controle.getLancamentos());
 
 		double saldo = controle.calcularSaldo();
 
@@ -370,14 +394,24 @@ public class TelaPrincipal extends JFrame implements ActionListener {
 		rotuloSaldo.setText("Saldo: " + Formatador.formatarMoeda(saldo));
 
 		if (saldo < 0) {
-			rotuloSaldo.setForeground(VERMELHO);
+			rotuloSaldo.setTextFill(VERMELHO);
 		} else {
-			rotuloSaldo.setForeground(VERDE);
+			rotuloSaldo.setTextFill(VERDE);
 		}
 	}
 
+	// todas as janelas de aviso são montadas aqui
+	private Alert criarAlerta(AlertType tipo, String titulo, String mensagem) {
+		Alert alerta = new Alert(tipo);
+		alerta.initOwner(janela);
+		alerta.setTitle(titulo);
+		alerta.setHeaderText(null);
+		alerta.setContentText(mensagem);
+		return alerta;
+	}
+
 	private void mostrarErro(String mensagem) {
-		JOptionPane.showMessageDialog(this, mensagem, "Atenção", JOptionPane.ERROR_MESSAGE);
+		criarAlerta(AlertType.ERROR, "Atenção", mensagem).showAndWait();
 	}
 
 }
