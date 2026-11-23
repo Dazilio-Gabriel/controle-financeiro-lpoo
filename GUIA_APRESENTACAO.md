@@ -6,6 +6,8 @@
 
 ## Sumário
 
+- [Quem apresenta o quê](#quem-apresenta-o-quê)
+
 1. [O programa em 30 segundos](#1-o-programa-em-30-segundos)
 2. [Mapa das classes](#2-mapa-das-classes)
 3. [Conceitos de POO, um por um](#3-conceitos-de-poo-um-por-um)
@@ -17,6 +19,73 @@
 9. [Roteiro de demonstração](#9-roteiro-de-demonstração)
 10. [Perguntas que a professora pode fazer](#10-perguntas-que-a-professora-pode-fazer)
 11. [Cola rápida](#11-cola-rápida)
+
+---
+
+## Quem apresenta o quê
+
+A apresentação está dividida em três partes, nesta ordem. Ela vai do mais concreto (o que o programa faz) para o mais abstrato (polimorfismo e a tela), e cada um cobre pelo menos um dos seis conceitos do enunciado.
+
+| Ordem | Quem | Tempo | Tema | Conceitos do enunciado | Estudar | Demonstração |
+|---|---|---|---|---|---|---|
+| 1º | **Belfor** | ~3 min | O que o programa faz e como os dados são organizados | Herança | Seções 1, 2, 3.1, 3.2 e 3.3 | Passos 1 e 2 |
+| 2º | **Gabriel** | ~4 min | Erros, listas e arquivo | Exceção, coleções, leitura e gravação | Seções 4, 5 e 6 | Passos 3 a 7 |
+| 3º | **Rodrigo** | ~5 min | Polimorfismo e a tela | Polimorfismo e interface gráfica | Seções 3.4, 3.5, 3.6, 7 e 8 | Passos 8 a 10 |
+
+Os passos da demonstração estão na [seção 9](#9-roteiro-de-demonstração) e as perguntas numeradas na [seção 10](#10-perguntas-que-a-professora-pode-fazer).
+
+**Para os três:**
+
+- A nota é individual e a professora pode perguntar qualquer coisa para qualquer um. Além da sua parte, leia a seção 2 (mapa das classes) e a seção 11 (cola rápida).
+- Quem não falar na apresentação fica com zero no trabalho, então todo mundo precisa falar a sua parte.
+- Combinem quem mexe no computador. O mais simples é uma pessoa só operar o programa do começo ao fim, enquanto quem está falando diz o que clicar.
+- As falas prontas (🗣️) não são para decorar. Leia em voz alta duas ou três vezes e depois fale com as suas palavras.
+- A seção 3.7 (`static` e `final`) não entra na fala de ninguém. Se ela perguntar, a resposta está na cola rápida.
+
+### Parte 1: Belfor (o programa e os dados)
+
+O que falar, na ordem:
+
+1. **Abertura:** a fala pronta da seção 1.
+2. **Demonstração, passos 1 e 2:** abrir o programa e lançar a "Conta de luz".
+3. **Mapa das classes:** o sistema tem três partes, que são a tela, as regras e o arquivo (seção 2).
+4. **Classe e objeto:** cada linha da tabela é um objeto (seção 3.1).
+5. **Encapsulamento:** abrir `Lancamento.java` e mostrar os quatro atributos `private`, que só têm `get` (seção 3.2).
+6. **Herança:** mostrar `Receita extends Lancamento`, `DespesaParcelada extends Despesa` e o `super` (seção 3.3).
+
+Arquivos para deixar abertos: `Lancamento.java`, `Receita.java` e `DespesaParcelada.java`.
+
+Perguntas que podem vir: 4 (o que o `super` faz), 5 (por que não tem `set`) e 15 (a parcelada desconta tudo de uma vez?).
+
+> 🗣️ **Passagem:** "Agora o Gabriel mostra o que acontece quando o usuário digita um dado errado."
+
+### Parte 2: Gabriel (erros, listas e arquivo)
+
+O que falar, na ordem:
+
+1. **Exceção, com os passos 3 e 4 da demonstração:** provocar os dois erros e depois mostrar `LancamentoInvalidoException.java`, um `throw` no construtor de `Lancamento` e o `try/catch` de `adicionarLancamento()` (seção 4).
+2. **Coleções, com o passo 5:** mostrar a `ArrayList` em `ControleFinanceiro`, abrir o Resumo por categoria e explicar o `TreeMap` de `calcularDespesasPorCategoria()` (seção 5).
+3. **Arquivo, com os passos 6 e 7:** abrir o `.csv`, fechar e abrir o programa, e mostrar `ler()` e `gravar()` em `ArquivoLancamentos.java`, incluindo o `finally` (seção 6).
+
+Arquivos para deixar abertos: `LancamentoInvalidoException.java`, `ControleFinanceiro.java`, `ArquivoLancamentos.java` e `TelaPrincipal.java` (métodos `lerValor` e `adicionarLancamento`).
+
+Perguntas que podem vir: 6 (`throw` e `throws`), 7 (por que uma exceção própria), 8 (`finally`), 9 (`ArrayList` ou vetor), 10 (por que `TreeMap`), 11 (arquivo que não existe ou com linha errada), 16 (`double` para dinheiro) e 18 (regravar o arquivo inteiro).
+
+> 🗣️ **Passagem:** "Para fechar, o Rodrigo mostra como o saldo é calculado e como a tela funciona."
+
+### Parte 3: Rodrigo (polimorfismo e a tela)
+
+O que falar, na ordem:
+
+1. **Classe abstrata:** por que `Lancamento` é `abstract` e o que são os métodos abstratos (seção 3.4).
+2. **Polimorfismo, com os passos 8 e 9:** lançar a Geladeira parcelada e mostrar o `calcularSaldo()`, que não tem nenhum `if`, mais a tabela de respostas de cada classe (seção 3.5).
+3. **Interface:** o `Comparable` explica por que a Geladeira entrou no meio da tabela, pela data (seção 3.6).
+4. **Tela e botões, com o passo 10:** `Stage`, `Scene` e layouts; depois `setOnAction(this)`, `handle` e `getSource()` (seção 7).
+5. **Fechamento:** o caminho completo de um clique, que junta as três partes (seção 8).
+
+Arquivos para deixar abertos: `ControleFinanceiro.java` (método `calcularSaldo`), `Lancamento.java`, `TelaPrincipal.java` e `Main.java`.
+
+Perguntas que podem vir: 1 (por que abstrata), 2 (onde está o polimorfismo), 3 (sobrescrita e sobrecarga), 12 (o `this` no `setOnAction`), 13 (`Main` separado), 14 (aviso no console) e 17 (interface criada pelo grupo).
 
 ---
 
@@ -616,20 +685,20 @@ adicionarLancamento()
 
 ## 9. Roteiro de demonstração
 
-Cinco minutos, tocando em todos os conceitos. Os valores abaixo consideram o arquivo de exemplo original.
+A demonstração acompanha a ordem das falas: cada um mostra na tela o que está explicando. Os valores abaixo consideram o arquivo de exemplo original e os passos feitos nesta ordem.
 
-| # | O que fazer | O que mostrar e dizer |
-|---|---|---|
-| 1 | Abrir o programa (`Main.java` → *Run As → Java Application*). | **Leitura de arquivo:** a tabela já vem com 8 lançamentos lidos do CSV. Saldo: R$ 863,70. |
-| 2 | Adicionar **Despesa**, "Conta de luz", valor `185,40`, categoria Moradia. | **Coleções:** entrou na lista e na tabela. Saldo vai para R$ 678,30. |
-| 3 | Trocar o Tipo para **Despesa parcelada**. | **Eventos:** o campo Parcelas libera sozinho. |
-| 4 | Adicionar "Geladeira", valor `2400,50`, data `09/11/2026`, categoria Moradia, 10 parcelas. | **Herança e polimorfismo:** a coluna Observação mostra "10x de R$ 240,05", que só a parcelada tem. A linha entra no meio da tabela, pela data (**ordenação**). Saldo fica **vermelho**: R$ -1.722,20. |
-| 5 | Digitar `abc` no valor e clicar em Adicionar. | **Exceção:** aparece "Valor inválido..." e o programa continua aberto. |
-| 6 | Valor `10`, descrição qualquer, data `31/02/2026`. | **Exceção:** "Data inválida...". O sistema recusa data que não existe. |
-| 7 | Clicar em **Resumo por categoria**. | **TreeMap:** totais por categoria em ordem alfabética. Moradia aparece com R$ 3.935,90. |
-| 8 | Selecionar a Geladeira e clicar em **Remover selecionado** → Sim. | Confirmação e saldo de volta para R$ 678,30, verde. |
-| 9 | Abrir `dados/lancamentos.csv`. | **Gravação:** a Conta de luz está lá no arquivo. |
-| 10 | Fechar e abrir o programa de novo. | Os dados continuam: foram lidos do arquivo. |
+| # | Quem | O que fazer | O que mostrar e dizer |
+|---|---|---|---|
+| 1 | Belfor | Abrir o programa (`Main.java` → *Run As → Java Application*). | A tabela já vem com 8 lançamentos, lidos do arquivo. Saldo: R$ 863,70. |
+| 2 | Belfor | Adicionar **Despesa**, "Conta de luz", valor `185,40`, categoria Moradia. | **Objeto novo:** apareceu uma linha na tabela. Despesas vão para R$ 4.321,70 e o saldo para R$ 678,30. |
+| 3 | Gabriel | Escrever qualquer descrição, digitar `abc` no valor e clicar em Adicionar. | **Exceção:** aparece "Valor inválido..." e o programa continua aberto. Nada foi gravado. |
+| 4 | Gabriel | Trocar o valor para `10` e a data para `31/02/2026`. Adicionar. | **Exceção:** "Data inválida...". O sistema recusa data que não existe. |
+| 5 | Gabriel | Clicar em **Resumo por categoria**. | **TreeMap:** categorias em ordem alfabética. Moradia aparece com R$ 1.535,40 e o total é R$ 4.321,70. |
+| 6 | Gabriel | Abrir `dados/lancamentos.csv`. | **Gravação:** a última linha é a Conta de luz. |
+| 7 | Gabriel | Fechar e abrir o programa de novo. | **Leitura:** os 9 lançamentos continuam lá. |
+| 8 | Rodrigo | Trocar o Tipo para **Despesa parcelada**. | **Eventos:** as categorias mudam e o campo Parcelas libera sozinho. |
+| 9 | Rodrigo | Adicionar "Geladeira", valor `2400,50`, data `09/11/2026`, categoria Moradia, 10 parcelas. | **Polimorfismo:** a coluna Observação mostra "10x de R$ 240,05", que só a parcelada tem. A linha entra no meio da tabela, pela data (**ordenação**). O saldo fica **vermelho**: R$ -1.722,20. |
+| 10 | Rodrigo | Selecionar a Geladeira e clicar em **Remover selecionado** → Sim. | **Botões e janelas:** aparece a confirmação e o saldo volta para R$ 678,30, verde. |
 
 **Para ensaiar e depois voltar o arquivo ao original**, rode no terminal dentro da pasta do projeto:
 
@@ -639,7 +708,8 @@ git restore dados/lancamentos.csv
 
 Dicas para a hora:
 
-- Faça **um erro de cada vez** nos passos 5 e 6. Se o valor e a data estiverem errados juntos, só a mensagem do valor aparece, porque ele é conferido primeiro.
+- Faça **um erro de cada vez** nos passos 3 e 4. Se o valor e a data estiverem errados juntos, só a mensagem do valor aparece, porque ele é conferido primeiro.
+- No passo 6, se for abrir o `.csv` pelo Eclipse, clique no projeto e aperte **F5** antes, para ele recarregar o arquivo. Ou abra pelo Bloco de Notas.
 - O aviso `Unsupported JavaFX configuration` no console é normal (veja a pergunta 14).
 
 ---

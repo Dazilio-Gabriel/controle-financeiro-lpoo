@@ -6,3 +6,6 @@ bin/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Workspace do Eclipse aberto dentro da pasta por engano
+.metadata/
